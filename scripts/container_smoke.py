@@ -4,6 +4,7 @@ Run: python scripts/container_smoke.py task-service:test
 Uses only the Python standard library. Cleans up its own containers and volume.
 """
 import json
+from http.client import HTTPException
 import os
 import secrets
 import subprocess
@@ -35,7 +36,7 @@ def main():
                 with opener.open(base + '/health', timeout=1) as response:
                     if response.status == 200:
                         return base
-            except (URLError, TimeoutError):
+            except (URLError, OSError, HTTPException):
                 time.sleep(.2)
         raise RuntimeError('Container did not become live within the startup deadline')
 
