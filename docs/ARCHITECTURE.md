@@ -1,6 +1,6 @@
 # Architecture and implementation milestones
 
-A synchronous REST service for one trusted team. Requests pass through bearer-key authentication and Pydantic validation, then a short-lived SQLAlchemy session reads or writes SQLite. This project has no frontend and no per-user login system.
+A synchronous REST service for one trusted team. Thin HTTP routes delegate task queries and mutations to `TaskService`; the service has no FastAPI dependency. Requests pass through bearer-key authentication and Pydantic validation, then a short-lived SQLAlchemy session reads or writes SQLite. This project has no frontend and no per-user login system.
 
 ```mermaid
 flowchart TD
@@ -8,7 +8,7 @@ flowchart TD
     B -->|Invalid or missing| C["401 response"]
     B -->|Valid| D["FastAPI routes and Pydantic validation"]
     D -->|Invalid input| E["422 response"]
-    D -->|Valid input| F["SQLAlchemy request session"]
+    D -->|Valid input| F["TaskService and SQLAlchemy session"]
     F <--> G[("SQLite database")]
     F --> H["Task JSON or 404 response"]
     H --> A
@@ -24,7 +24,7 @@ Accept when a task remains available after the application closes and reopens th
 
 ## Milestone 2: task contracts and CRUD
 
-Read `app/schemas.py` and `app/routes.py`. The create schema requires a nonblank title. The response schema returns the database ID and UTC creation time. PATCH applies only supplied fields. Optional values can be explicitly cleared; title, status and priority cannot be null. Historical due dates are allowed for overdue work.
+Read `app/schemas.py`, `app/routes.py` and `app/task_service.py`. Routes define HTTP inputs and responses; the service owns queries and writes. A shared date validator serves both create and update schemas. The create schema requires a nonblank title. The response schema returns the database ID and UTC creation time. PATCH applies only supplied fields. Optional values can be explicitly cleared; title, status and priority cannot be null. Historical due dates are allowed for overdue work.
 
 Run: `python -m pytest -q tests/test_tasks.py`.
 

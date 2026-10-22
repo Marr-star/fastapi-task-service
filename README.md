@@ -162,6 +162,8 @@ Dockerfile     Non-root container with persistent data path
 .env.example   Documented configuration without credentials
 ```
 
+HTTP routes live in `app/routes.py`; task queries and persistence live in `app/task_service.py`. Shared Pydantic field validation lives in `app/schemas.py`. The service raises a task-not-found exception, and the app maps it to the documented HTTP 404 response.
+
 The [incremental build guide](docs/ARCHITECTURE.md) explains each milestone, its files, commands and acceptance criteria.
 
 ## References

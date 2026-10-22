@@ -4,6 +4,7 @@ Verified locally on Python 3.12 on 22 October 2026.
 
 | Check | Result | Evidence |
 | --- | --- | --- |
+| API contract after refactor | Passed | Generated OpenAPI document is identical to the published contract |
 | Automated tests | Passed | 75 tests passed with pytest |
 | Uvicorn startup and liveness | Passed | `/health` returned 200 and `{"status":"ok"}` |
 | Unauthenticated task request | Passed | `/tasks` returned 401 |
