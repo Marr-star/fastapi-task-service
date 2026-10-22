@@ -62,7 +62,7 @@ Open **[Swagger UI](http://127.0.0.1:8000/docs)**. Click **Authorize** and paste
 
 | Field | Type | Rules |
 | --- | --- | --- |
-| `id` | Integer | Server-generated positive ID |
+| `id` | Integer | Server-generated positive ID; not reused after deletion in new SQLite databases |
 | `title` | String | Required, 1–200 characters after trimming |
 | `description` | String or null | Up to 5,000 characters |
 | `owner` | String or null | Optional name label, 1–100 characters |
@@ -112,11 +112,13 @@ flowchart TD
 python -m pytest -q
 ```
 
-**74 tests pass locally.** The automated suite covers task CRUD, invalid and missing values, every protected route, missing IDs, partial updates, status/priority/owner filters, pagination, CORS, OpenAPI security metadata, environment configuration and persistence across app restarts. Tests use temporary databases and never touch your development data.
+**75 tests pass locally.** The automated suite covers task CRUD, invalid and missing values, every protected route, missing IDs, partial updates, status/priority/owner filters, pagination, CORS, OpenAPI security metadata, environment configuration and persistence across app restarts. Tests use temporary databases and never touch your development data.
 
-GitHub Actions runs the tests on Python 3.12 and checks the Docker build. Local verification results are recorded in [docs/VERIFICATION.md](docs/VERIFICATION.md).
+GitHub Actions runs the tests on Python 3.12 and builds the Docker image and runs an HTTP smoke test, including authentication, CRUD and persistence across container replacement. Local verification results are recorded in [docs/VERIFICATION.md](docs/VERIFICATION.md).
 
 ## Docker
+
+After building, run `python scripts/container_smoke.py fastapi-task-service` to verify the container and volume persistence.
 
 ```bash
 docker build -t fastapi-task-service .
@@ -129,6 +131,8 @@ docker run --rm -p 127.0.0.1:8000:8000 \
 ```
 
 The process runs as a non-root user. The named volume keeps SQLite data when the container is replaced. The explicit database override ensures a local `.env` URL does not redirect storage outside the volume.
+
+Existing development databases created before the non-reusing ID change need a table migration; `create_all()` does not alter existing tables. For disposable demo data, recreate the database instead.
 
 ## Configuration
 
@@ -153,6 +157,7 @@ Before public production use: add managed user authentication and task-level aut
 app/           Configuration, models, schemas, database, security and routes
 tests/         Isolated API, persistence and security tests
 docs/          API examples, architecture, verification and portfolio proof
+scripts/       Container smoke test
 Dockerfile     Non-root container with persistent data path
 .env.example   Documented configuration without credentials
 ```

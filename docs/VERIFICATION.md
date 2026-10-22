@@ -4,7 +4,7 @@ Verified locally on Python 3.12 on 22 October 2026.
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| Automated tests | Passed | 74 tests passed with pytest |
+| Automated tests | Passed | 75 tests passed with pytest |
 | Uvicorn startup and liveness | Passed | `/health` returned 200 and `{"status":"ok"}` |
 | Unauthenticated task request | Passed | `/tasks` returned 401 |
 | Create over live HTTP | Passed | POST `/tasks` returned 201 |
@@ -15,7 +15,8 @@ Verified locally on Python 3.12 on 22 October 2026.
 | Delete and missing record | Passed | DELETE returned 204; subsequent GET returned 404 |
 | Persistence after restart | Passed | Automated test closed and recreated the app against the same SQLite file |
 | OpenAPI | Passed | Security metadata tested; generated contract saved as `openapi.json` |
-| Docker build/run | Not run locally | Docker is unavailable in the build environment; CI includes a build check |
+| Docker build/run | Not run locally | Docker is unavailable in the build environment; CI includes build and live HTTP/container-persistence checks |
+| Deleted task ID reuse | Passed | Regression test confirms a deleted URL remains 404 after another task is created |
 | Public deployment | Not deployed | Local development and packaging only |
 
 The Swagger screenshot is captured before entering credentials. During browser verification, the official Swagger JavaScript and CSS were cached locally because direct browser CDN access was unavailable in the verification environment. The API HTML, OpenAPI schema and endpoint responses came from the running application.

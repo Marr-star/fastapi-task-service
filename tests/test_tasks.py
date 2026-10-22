@@ -103,3 +103,12 @@ def test_file_database_survives_app_restart(settings):
         task = first.post('/tasks', headers=headers, json={'title': 'Persistent task'}).json()
     with TestClient(create_app(settings)) as second:
         assert second.get(f'/tasks/{task["id"]}', headers=headers).json()['title'] == 'Persistent task'
+
+
+def test_deleted_task_url_never_resolves_to_a_new_task(client):
+    first = client.post('/tasks', json={'title': 'Original task'}).json()
+    original_url = f'/tasks/{first["id"]}'
+    assert client.delete(original_url).status_code == 204
+    second = client.post('/tasks', json={'title': 'Different task'}).json()
+    assert second['id'] > first['id']
+    assert client.get(original_url).status_code == 404

@@ -14,6 +14,7 @@ class Task(Base):
         CheckConstraint("status IN ('todo', 'in_progress', 'done')", name='valid_status'),
         CheckConstraint("priority IN ('low', 'medium', 'high')", name='valid_priority'),
         CheckConstraint('length(title) BETWEEN 1 AND 200', name='valid_title_length'),
+        {'sqlite_autoincrement': True},
     )
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(200))
